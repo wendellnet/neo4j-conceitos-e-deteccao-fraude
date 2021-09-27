@@ -1,0 +1,442 @@
+<article class="guide">
+  <carousel class="deck container-fluid">
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h3>Detecção de fraude bancária</h3>
+      </div>
+      <div class="col-sm-9">
+        <p>Este tutorial de gráficos interativos do Neo4j abrange um pequeno cenários de detecção de fraudes bancárias.</p>
+        <p>Veremos neste guia:</p>
+        <ol class="big">
+          <li>Comandos: CREATE, MATCH, DELETE, MERGE, WHERE</li>
+          <li>Identificar possíveis fraudadores: encontrar correntistas que compartilham informações legítimas de contato</li>
+          <li>Risco financeiro: determine o risco financeiro de um possível grupo de fraudadores</li>
+        </ol>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-12">
+        <h3>Introdução ao Problema</h3><br>
+        <p>
+          Bancos e companhias de seguros perdem bilhões de dólares todos os anos por fraude. Os métodos tradicionais de detecção de fraudes desempenham um papel importante na minimização dessas perdas. No entanto, fraudadores cada vez mais sofisticados desenvolveram uma variedade de maneiras de escapar da descoberta, tanto trabalhando juntos quanto aproveitando vários outros meios de construir identidades falsas.
+        </p>
+      </div>
+    </slide>   
+    <slide class="row-fluid">
+      <div class="col-sm-12">
+        <h3>Cenário</h3><br>
+        <p>
+          Embora nenhuma medida de prevenção de fraudes possa ser perfeita, uma oportunidade significativa de melhoria reside em olhar além dos pontos de dados individuais, para as conexões que as ligam. Muitas vezes essas conexões passam despercebidas até que seja tarde demais- algo que é lamentável, já que essas conexões muitas vezes possuem as melhores pistas.
+        </p>
+        <h4>Mais informações</h4><br>
+        <p>Embora os detalhes exatos por trás de cada conluio de fraude de primeira parte variem de operação para operação, o padrão abaixo ilustra como os grupos de fraudes geralmente operam:
+        </p>
+        <ol>
+          <li>Um grupo de duas ou mais pessoas se organizam em um anel de fraude</li>
+          <li>O grupo compartilha um subconjunto de informações legítimas de contato, ou seja, números de telefone e endereços, combinando-os para criar uma série de identidades fictícias</li>
+          <li>Membros do grupo abrem contas usando essas identidades fictícias</li>
+          <li>Novas contas são adicionadas às originais: linhas de crédito não inseguras, cartões de crédito, proteção contra cheque especial, empréstimos pessoais, etc.</li>
+          <li>As contas são usadas normalmente, com compras regulares e pagamentos oportunos</li>
+          <li>Bancos aumentam as linhas de crédito rotativo ao longo do tempo, devido ao comportamento de crédito responsável observado</li>
+          <li>Um dia o anel "arrebenta", coordenando sua atividade, maximizando todas as suas linhas de crédito, e desaparecendo</li>
+          <li>Às vezes, os fraudadores vão mais longe e trazem todos os seus saldos para zero usando cheques falsos imediatamente antes da etapa anterior, dobrando o dano</li>
+          <li>Processos de cobranças se seguem, mas os agentes nunca são capazes de chegar ao fraudador</li>
+          <li>A dívida não coletectável é anulada</li>
+        </ol>
+      </div>
+    </slide>   
+    <slide class="row-fluid">
+      <div class="col-sm-12">
+        <h3>Solução</h3><br>
+        <p>
+          Os bancos de dados de gráficos oferecem novos métodos de descoberta de anéis de fraude e outros golpes sofisticados com alto grau de precisão, e são capazes de parar cenários avançados de fraude em tempo real.
+        </p>
+        <h4>Como bancos de dados de gráficos podem ajudar</h4><br>
+        <p>Aumentar a infraestrutura de detecção de fraudes existente para suportar a detecção de anel pode ser feito executando consultas apropriadas de análise de links de entidade usando um banco de dados gráfico e executando verificações durante estágios-chave no ciclo de vida do cliente & conta, tais como:
+        </p>
+        <ol>
+          <li>No momento em que a conta é criada</li>
+          <li>Durante uma investigação</li>
+          <li>Assim que um limite de saldo de crédito é atingido</li>
+          <li>Quando um cheque é compensado</li>
+        </ol>
+        <p><i>Travessias de gráficos em tempo real ligadas aos tipos certos de eventos podem ajudar os bancos a identificar prováveis anéis de fraude, durante ou mesmo antes do Bust-Out ocorrer</i></p>
+      </div>
+    </slide>  
+    <slide class="row-fluid">
+      <div class="col-sm-12">
+        <h3>Modelo de dados do gráfico de fraudes bancárias</h3><br>
+        <p>
+          Os bancos de dados de gráficos surgiram como uma ferramenta ideal para superar esses obstáculos. Linguagens como Cypher fornecem uma simples semântica para detectar anéis no gráfico, navegando conexões na memória, em tempo real.
+        </p>
+        <p>
+          O modelo de dados gráficos abaixo representa como os dados realmente olham para o banco de dados gráfico, e ilustra como se pode encontrar anéis simplesmente andando no gráfico:
+        </p>
+        <div class="content">
+          <img src="http://172.22.32.1:5000/imagens/modelo_fraude.png" alt="Fraude bancária" _mstalt="278655">
+        </div>
+    </div>
+    </slide>  
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Adicionar nós por Titular Conta e Telefone</h5><br>
+        <h3>CREATE</h3>
+        <p>
+          A criação de dados também usa padrões. Aqui estão dois padrões para a criação de TitularConta e Telefone. Simples, certo?
+        </p>
+        <p>Fazem isto:</p>
+        <ol>
+          <li>Adicione alguns Titulare de Conta e Telefones no gráfico</li>
+          <li>Observe o que acontece quando você cria a mesma coisa duas vezes</li>
+        </ol>
+        <hr>
+        <p>
+          <a help-topic="create">:help CREATE</a>
+        </p>
+      </div>
+      <div class="col-sm-9 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <div class="fields">
+              <div class="six wide field">
+                <label>Crie um titular de conta</label>
+              <input value-for="titular-nome" type="text" id="titular-nome" value="José">
+              </div>
+              <div class="six wide field">
+                <label>Sobrenome</label>
+                <input value-for="titular-sobrenome"  type="text" id="titular-sobrenome" value="Medeiros">
+              </div>
+            </div>
+          <pre style="color: #333" class="pre-scrollable code runnable"> CREATE (titularConta:TitularConta {nome: '<span value-key="titular-nome">José</span>',sobrenome: '<span value-key="titular-sobrenome">Medeiros</span>',UniqueId: '<span value-key="titular-nome">José</span><span value-key="titular-sobrenome">Medeiros</span>', ano:0 }) RETURN titularConta</pre>
+          </div>
+        </div>
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <div class="fields">
+              <div class="two wide field">
+                <label>ddd</label>
+              <input value-for="telefone-ddd" type="text" id="telefone-ddd" value="11">
+              </div>
+              <div class="six wide field">
+                <label>número</label>
+                <input value-for="telefone-numero"  type="text" id="telefone-numero" value="998780001">
+              </div>
+              <div class="eight wide field">
+                <label>tipo (celular-residencial-trabalho)</label>
+                <input value-for="telefone-tipo" type="text" id="telefone-tipo" value="celular">
+              </div>
+            </div>
+            <pre style="color: #333" class="pre-scrollable code runnable">CREATE (telefone:Telefone {ddd:'<span value-key="telefone-ddd">11</span>',numero:'<span value-key="telefone-numero">998780001</span>',tipo:'<span value-key="telefone-tipo">celular</span>'}) RETURN telefone</pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Removendo nós</h5><br>
+        <h3>DELETE</h3>
+        <p>
+          Para remover algumas das duplicatas que podem ter sido criadas, use um <code style="word-break:normal">DELETE</code> cláusula após correspondência
+           os nós indesejados.
+        </p>
+        <p>Faça isso:</p>
+        <ol>
+          <li>Exclua qualquer Titular de Conta ou telefone que você criou muitas vezes</li>
+          <li>Observe que esta consulta irá deletar nós <i>e</i> relacionamentos</li>
+          <li>O que é um relacionamento? Nós vamos chegar lá em breve</li>
+        </ol>
+        <hr>
+        <p>
+          <a help-topic="delete">:help DELETE</a>
+        </p>
+      </div>
+      <div class="col-sm-9 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <div class="fields">
+              <div class="seven wide field">
+                <label>Exclua todas contas com nome</label>
+              <input value-for="titular-nome" type="text" id="titular-nome" value="José">
+              </div>
+            </div>
+            <pre style="color: #333" class="pre-scrollable code runnable">MATCH (titularConta:TitularConta {nome:'<span value-key="titular-nome">José</span>'}) DETACH DELETE titularConta</pre>
+          </div>
+        </div>
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <div class="fields">
+              <div class="seven wide field">
+                <label>Excluir todos telefones</label>
+                <input value-for="telefone-numero"  type="text" id="telefone-numero" value="998780001">
+              </div>
+            </div>
+            <pre style="color: #333" class="pre-scrollable code runnable">MATCH (telefone:Telefone {numero:'<span value-key="telefone-numero">998780001</span>'}) DETACH DELETE telefone</pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Criar ou atualiza nós</h5><br>
+        <h3>MERGE</h3>
+        <p>
+          Para evitar duplicatas, você pode usar uma instrução MERGE. Isso atua como uma combinação de correspondência, criação ou atualização.
+        </p>
+        <p>Faça isso:</p>
+        <ol>
+          <li>Adicione a mesma pessoa várias vezes</li>
+          <li>Observe como a propriedade de estrelas aumenta</li>
+          <li>Mas o ano de nascimento é definido apenas uma vez</li>
+        </ol>
+        <hr>
+        <p>
+          <a help-topic="merge">:help MERGE</a>
+        </p>
+      </div>
+      <div class="col-sm-9 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <div class="fields">
+              <div class="six wide field">
+                <label>Atualize sobrenome</label>
+              <input value-for="titular-nome" type="text" id="titular-nome" value="José">
+              </div>
+              <div class="six wide field">
+                <label>Ano Nascimento</label>
+                <input value-for="titular-ano"  type="text" id="titular-ano" value="1980">
+              </div>
+            </div>
+            <pre style="color: #333" class="pre-scrollable code runnable">MERGE (titularConta:TitularConta {nome:'<span value-key="titular-nome">José</span>'}) 
+ON CREATE SET titularConta.ano = <span value-key="titular-ano">1980</span> 
+ON MATCH SET titularConta.stars = COALESCE(titularConta.stars, 0) + 1
+RETURN titularConta</pre>
+          </div>
+        </div>
+        <p>Geralmente, um padrão <code style="word-break:normal">MERGE</code> deve ser o mínimo, mas específico possível.</p>
+        <p>Uma instrução merge tem duas cláusulas de sub-instrução: <code style="word-break:normal">ON CREATE</code> e <code style="word-break:normal">ON MATCH</code> .
+          Use <code style="word-break:normal">ON CREATE</code> para definir valores para nós recém-criados.
+          Use <code style="word-break:normal">ON MATCH</code> para atualizar os valores dos nós existentes.
+        </p>
+      </div>
+    </slide>
+
+
+
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Criar ou atualizar relacionamentos</h5><br>
+        <h3>MERGE junto</h3>
+        <p>A mágica dos gráficos acontece quando você cria conexões explícitas entre os registros. Chamamos esses relacionamentos.</p>
+        <p>Faça isso:</p>
+        <ol>
+          <li>Combine um titular com um telefone</li>
+          <li>Indique desde quando o titular tem o telefone</li>
+        </ol>
+        <hr>
+        <p>
+          <a help-topic="merge">:help MERGE</a>
+        </p>
+      </div>
+      <div class="col-sm-9 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <div class="fields">
+              <div class="six wide field">
+                <label>nome titular</label>
+                <input value-for="titular-nome" type="text" id="titular-nome" value="José">
+              </div>
+              <div class="four wide field">
+                <label>data compra</label>
+                <input value-for="compra-role" type="text" id="compra-role" value="2020-10-01">
+              </div>
+              <div class="six wide field">
+                <label>numero telefone</label>
+                <input value-for="telefone-numero" type="text" id="telefone-numero" value="998780001">
+              </div>
+            </div>
+            <pre style="color: #333" class="pre-scrollable code runnable">MATCH (titularConta:TitularConta {nome:'<span value-key="titular-nome">José</span>'}), (telefone:Telefone {numero:'<span value-key="telefone-numero">998780001</span>'})
+MERGE (titularConta)-[r:COMPRA_EM]->(telefone) SET r.roles = ['<span value-key="compra-role">2020-10-01</span>']
+RETURN titularConta,r,telefone</pre>
+          </div>
+        </div>
+        <p>O gráfico do telefone usa um único relacionamento <code style="word-break:normal">COMPRA_EM</code> entre um titular e um telefone. 
+        Usar <code style="word-break:normal">MERGE</code> garante que apenas um relacionamento será criado desse tipo. 
+        </p>
+        <p>Essa consulta só será bem-sucedida se o titular da conta e o telefone já existirem. Caso contrário, nada acontecerá e você verá 'nenhuma mudança, nenhum registro' relatado no quadro de resultados.</p>
+      </div>
+    </slide>
+
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Criar exemplo bancário</h5><br>
+        <h3>Fraude bancária</h3>
+        <p>Crie o data set de exemplo</p>
+        <p>Faça isso:</p>
+        <ol>
+          <li>Crie titulares de contas</li>
+          <li>Crie teleone</li>
+          <li>Crie conta bancária</li>
+          <li>Crie endereços</li>
+          <li>Crie emprestimos sem garantia</li>
+        </ol>
+        <hr>
+      </div>
+      <div class="col-sm-9 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <pre style="color: #333" class="pre-scrollable code runnable">
+CREATE (titularConta1:TitularConta {
+       		Nome: "Joao",
+       		Sobrenome: "Gonçalves",
+       		UniqueId: "JoaoGonçalves" })
+
+CREATE (titularConta2:TitularConta {
+			Nome: "Janaina",
+			Sobrenome: "Oliveira",
+			UniqueId: "JanainaOliveira" })
+
+CREATE (titularConta3:TitularConta {
+			Nome: "Igor",
+			Sobrenome: "Santos",
+			UniqueId: "IgorSantos" })
+
+CREATE (endereco1:Endereco {
+			Rua: "Frei Gaspar",
+			Cidade: "São Vicente",
+			Estado: "São Paulo",
+			Cep: "11360020" })
+
+CREATE (titularConta1)-[:TEM_ENDERECO]->(endereco1),
+       (titularConta2)-[:TEM_ENDERECO]->(endereco1),
+       (titularConta3)-[:TEM_ENDERECO]->(endereco1)
+
+CREATE (telefone1:Telefone { Ddd:11 , Telefone: "555-555-5555", Tipo: "celular" })
+
+CREATE (titularConta1)-[:TEM_TELEFONE]->(telefone1),
+       (titularConta2)-[:TEM_TELEFONE]->(telefone1)
+
+CREATE (cpf1:CPF { CPF: "28.598.970-20" })
+
+CREATE (titularConta2)-[:TEM_CPF]->(cpf1),
+      (titularConta3)-[:TEM_CPF]->(cpf1)
+
+CREATE (cpf2:CPF { CPF: "28.598.870-88" })<-[:TEM_CPF]-(titularConta1)
+
+CREATE (cartaoCredito1:CartaoCredito {
+    Nome: "JOAO GONÇALVES",
+    Operador: "Visa",
+    NumeroCartao: "1234567890123456",
+    Limite: 5000, Saldo: 1442.23,
+    DataVencimento: "01-20",
+    CodigoSeguranca: "123" })<-[:TEM_CARTAOCREDITO]-(titularConta1)
+
+CREATE (contaBancaria1:ContaBancaria {
+    NumeroConta: "2345678901234567",
+    Saldo: 7054.43 })<-[:TEM_CONTABANCARIA]-(titularConta1)
+
+CREATE (cartaoCredito2:CartaoCredito {
+    Nome: "JANAINA OLIVEIRA",
+    Operador: "Visa",
+    NumeroCartao: "1234567890123456",
+    Limite: 4000, Saldo: 2345.56,
+    DataVencimento: "02-20",
+    CodigoSeguranca: "456" })<-[:TEM_CARTAOCREDITO]-(titularConta2)
+
+CREATE (contaBancaria2:ContaBancaria {
+    NumeroConta: "3456789012345678",
+    Saldo: 4231.12 })<-[:TEM_CONTABANCARIA]-(titularConta2)
+
+CREATE (emprestimoSemGarantia2:EmprestimoSemGarantia {
+    NumeroEmprestimo: "4567890123456789-0",
+    Saldo: 9045.53,
+    APR: .0541,
+    TotalEmprestimo: 12000.00 })<-[:TEM_EMPRESTIMOSEMGARANTIA]-(titularConta2)
+
+CREATE (contaBancaria3:ContaBancaria {
+    NumeroConta: "4567890123456789",
+    Saldo: 12345.45 })<-[:TEM_CONTABANCARIA]-(titularConta3)
+
+CREATE (emprestimoSemGarantia3:EmprestimoSemGarantia {
+    NumeroEmprestimo: "5678901234567890-0",
+    Saldo: 16341.95, APR: .0341,
+    TotalEmprestimo: 22000.00 })<-[:TEM_EMPRESTIMOSEMGARANTIA]-(titularConta3)
+
+CREATE (telefone2:Telefone {
+    Telefone: "555-555-1234" })<-[:TEM_TELEFONE]-(titularConta3)
+
+RETURN *
+            </pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h3>Análise de Link de Entidades</h3>
+        <p>Usamos suportes na tabela abaixo para isolar elementos individuais de uma coleção</p>
+        <hr>
+      </div>
+      <div class="col-sm-9 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <p>Encontre correntistas que compartilhem mais de uma parte das informações legítimas de contato</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+
+MATCH 		(titularConta:TitularConta)-[]->(informacaoContato)
+WITH 		informacaoContato,
+			count(titularConta) AS Tamanho
+MATCH 		(informacaoContato)<-[]-(titularConta)
+WITH 		collect(titularConta.UniqueId) AS TitularContas,
+			informacaoContato, Tamanho
+WHERE 		Tamanho > 1
+RETURN 		TitularContas AS Fraude,
+			labels(informacaoContato) AS TipoContato,
+			Tamanho
+ORDER BY 	Tamanho DESC
+
+            </pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h3>Análise de Link de Entidades</h3>
+        <p>Determine o risco financeiro de um possível grupo de fraudadores</p>
+        <hr>
+      </div>
+      <div class="col-sm-9 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <p>Encontre correntistas que compartilhem mais de uma parte das informações legítimas de contato</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+
+MATCH 		(titularConta:TitularConta)-[]->(informacaoContato)
+WITH 		informacaoContato,
+			count(titularConta) AS Tamanho
+MATCH 		(informacaoContato)<-[]-(titularConta),
+			(titularConta)-[r:TEM_CARTAOCREDITO|TEM_EMPRESTIMOSEMGARANTIA]->(emprestimoSemGarantia)
+WITH 		collect(DISTINCT titularConta.UniqueId) AS TitularContas,
+			informacaoContato, Tamanho,
+			SUM(CASE type(r)
+				WHEN 'TEM_CARTAOCREDITO' THEN emprestimoSemGarantia.Limite
+				WHEN 'TEM_EMPRESTIMOSEMGARANTIA' THEN emprestimoSemGarantia.Saldo
+				ELSE 0
+			END) as RiscoFinanceiro
+WHERE 		Tamanho > 1
+RETURN 		TitularContas AS Fraude,
+			labels(informacaoContato) AS TipoContato,
+			Tamanho,
+			round(RiscoFinanceiro) as RiscoFinanceiro
+ORDER BY 	RiscoFinanceiro DESC
+
+            </pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+
+  </carousel>
+</article>
