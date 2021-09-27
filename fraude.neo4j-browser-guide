@@ -273,7 +273,7 @@ RETURN titularConta,r,telefone</pre>
         <p>Faça isso:</p>
         <ol>
           <li>Crie titulares de contas</li>
-          <li>Crie teleone</li>
+          <li>Crie telefones, cpf, email</li>
           <li>Crie conta bancária</li>
           <li>Crie endereços</li>
           <li>Crie emprestimos sem garantia</li>
