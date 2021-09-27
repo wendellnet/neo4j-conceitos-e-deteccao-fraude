@@ -107,7 +107,7 @@
                 <input value-for="titular-sobrenome"  type="text" id="titular-sobrenome" value="Medeiros">
               </div>
             </div>
-          <pre style="color: #333" class="pre-scrollable code runnable"> CREATE (titularConta:TitularConta {nome: '<span value-key="titular-nome">José</span>',sobrenome: '<span value-key="titular-sobrenome">Medeiros</span>',UniqueId: '<span value-key="titular-nome">José</span><span value-key="titular-sobrenome">Medeiros</span>', ano:0 }) RETURN titularConta</pre>
+          <pre style="color: #333" class="pre-scrollable code runnable"> CREATE (titularConta:TitularConta {nome: '<span value-key="titular-nome">José</span>',sobrenome: '<span value-key="titular-sobrenome">Medeiros</span>',uniqueId: '<span value-key="titular-nome">José</span><span value-key="titular-sobrenome">Medeiros</span>', ano:0 }) RETURN titularConta</pre>
           </div>
         </div>
         <div class="ui card fluid">
@@ -207,8 +207,7 @@
               </div>
             </div>
             <pre style="color: #333" class="pre-scrollable code runnable">MERGE (titularConta:TitularConta {nome:'<span value-key="titular-nome">José</span>'}) 
-ON CREATE SET titularConta.ano = <span value-key="titular-ano">1980</span> 
-ON MATCH SET titularConta.stars = COALESCE(titularConta.stars, 0) + 1
+ON MATCH SET titularConta.stars = COALESCE(titularConta.stars, 0) + 1,  titularConta.ano = <span value-key="titular-ano">1980</span>
 RETURN titularConta</pre>
           </div>
         </div>
@@ -286,84 +285,112 @@ RETURN titularConta,r,telefone</pre>
           <div class="ui form content">
             <pre style="color: #333" class="pre-scrollable code runnable">
 CREATE (titularConta1:TitularConta {
-       		Nome: "Joao",
-       		Sobrenome: "Gonçalves",
-       		UniqueId: "JoaoGonçalves" })
+       		nome: "Joao",
+       		sobrenome: "Gonçalves",
+       		uniqueId: "JoaoGonçalves" })
 
 CREATE (titularConta2:TitularConta {
-			Nome: "Janaina",
-			Sobrenome: "Oliveira",
-			UniqueId: "JanainaOliveira" })
+			nome: "Janaina",
+			sobrenome: "Oliveira",
+			uniqueId: "JanainaOliveira" })
 
 CREATE (titularConta3:TitularConta {
-			Nome: "Igor",
-			Sobrenome: "Santos",
-			UniqueId: "IgorSantos" })
+			nome: "Igor",
+			sobrenome: "Santos",
+			uniqueId: "IgorSantos" })
 
+CREATE (titularConta4:TitularConta {
+                nome: "Julio",
+                sobrenome: "Andrade",
+                uniqueId: "JulioAndrade" })
+    
 CREATE (endereco1:Endereco {
-			Rua: "Frei Gaspar",
-			Cidade: "São Vicente",
-			Estado: "São Paulo",
-			Cep: "11360020" })
+			rua: "Frei Gaspar",
+			cidade: "São Vicente",
+			estado: "São Paulo",
+			cep: "11360020" })
 
+CREATE (endereco2:Endereco {
+            rua: "Ana Costa",
+            cidade: "Santos",
+            estado: "São Paulo",
+            cep: "11203030" })
+    
 CREATE (titularConta1)-[:TEM_ENDERECO]->(endereco1),
        (titularConta2)-[:TEM_ENDERECO]->(endereco1),
-       (titularConta3)-[:TEM_ENDERECO]->(endereco1)
+       (titularConta3)-[:TEM_ENDERECO]->(endereco1),
+       (titularConta4)-[:TEM_ENDERECO]->(endereco2)
 
-CREATE (telefone1:Telefone { Ddd:11 , Telefone: "555-555-5555", Tipo: "celular" })
+CREATE (telefone1:Telefone { ddd:11 , telefone: "991557555", tipo: "celular" })
 
 CREATE (titularConta1)-[:TEM_TELEFONE]->(telefone1),
        (titularConta2)-[:TEM_TELEFONE]->(telefone1)
 
-CREATE (cpf1:CPF { CPF: "28.598.970-20" })
+CREATE (email1:Email { email:"contato@comercio.com.br" })
+CREATE (email2:Email { email:"janaina@oliveira.com.br" })
+CREATE (email3:Email { email:"julio@andrade.com.br" })
+
+CREATE (titularConta1)-[:TEM_EMAIL]->(email1),
+              (titularConta2)-[:TEM_EMAIL]->(email1),
+              (titularConta2)-[:TEM_EMAIL]->(email2),
+              (titularConta3)-[:TEM_EMAIL]->(email3),
+              (titularConta4)-[:TEM_EMAIL]->(email1)
+              
+CREATE (cpf1:CPF { cpf: "28.598.970-20" })
+CREATE (cpf2:CPF { cpf: "30.598.970-20" })
+CREATE (cpf3:CPF { cpf: "55.009.970-20" })
 
 CREATE (titularConta2)-[:TEM_CPF]->(cpf1),
-      (titularConta3)-[:TEM_CPF]->(cpf1)
+      (titularConta3)-[:TEM_CPF]->(cpf2),
+      (titularConta4)-[:TEM_CPF]->(cpf3)
 
-CREATE (cpf2:CPF { CPF: "28.598.870-88" })<-[:TEM_CPF]-(titularConta1)
+CREATE (cpf4:CPF { cpf: "28.598.870-88" })<-[:TEM_CPF]-(titularConta1)
 
 CREATE (cartaoCredito1:CartaoCredito {
-    Nome: "JOAO GONÇALVES",
-    Operador: "Visa",
-    NumeroCartao: "1234567890123456",
-    Limite: 5000, Saldo: 1442.23,
-    DataVencimento: "01-20",
-    CodigoSeguranca: "123" })<-[:TEM_CARTAOCREDITO]-(titularConta1)
+    nome: "JOAO GONÇALVES",
+    operador: "Visa",
+    numeroCartao: "1234567890123456",
+    limite: 5000, saldo: 1442.23,
+    dataVencimento: "01-20",
+    codigoSeguranca: "123" })<-[:TEM_CARTAOCREDITO]-(titularConta1)
 
 CREATE (contaBancaria1:ContaBancaria {
-    NumeroConta: "2345678901234567",
-    Saldo: 7054.43 })<-[:TEM_CONTABANCARIA]-(titularConta1)
+    numeroConta: "2345678901234567",
+    saldo: 7054.43 })<-[:TEM_CONTABANCARIA]-(titularConta1)
 
 CREATE (cartaoCredito2:CartaoCredito {
-    Nome: "JANAINA OLIVEIRA",
-    Operador: "Visa",
-    NumeroCartao: "1234567890123456",
-    Limite: 4000, Saldo: 2345.56,
-    DataVencimento: "02-20",
-    CodigoSeguranca: "456" })<-[:TEM_CARTAOCREDITO]-(titularConta2)
+    nome: "JANAINA OLIVEIRA",
+    operador: "Visa",
+    numeroCartao: "1234567890123456",
+    limite: 4000, saldo: 2345.56,
+    dataVencimento: "02-20",
+    codigoSeguranca: "456" })<-[:TEM_CARTAOCREDITO]-(titularConta2)
 
 CREATE (contaBancaria2:ContaBancaria {
-    NumeroConta: "3456789012345678",
-    Saldo: 4231.12 })<-[:TEM_CONTABANCARIA]-(titularConta2)
+    numeroConta: "3456789012345678",
+    saldo: 4231.12 })<-[:TEM_CONTABANCARIA]-(titularConta2)
 
 CREATE (emprestimoSemGarantia2:EmprestimoSemGarantia {
-    NumeroEmprestimo: "4567890123456789-0",
-    Saldo: 9045.53,
-    APR: .0541,
-    TotalEmprestimo: 12000.00 })<-[:TEM_EMPRESTIMOSEMGARANTIA]-(titularConta2)
+    numeroEmprestimo: "4567890123456789-0",
+    saldo: 9045.53,
+    apr: .0541,
+    totalEmprestimo: 12000.00 })<-[:TEM_EMPRESTIMOSEMGARANTIA]-(titularConta2)
 
 CREATE (contaBancaria3:ContaBancaria {
-    NumeroConta: "4567890123456789",
-    Saldo: 12345.45 })<-[:TEM_CONTABANCARIA]-(titularConta3)
+    numeroConta: "4567890123456789",
+    saldo: 12345.45 })<-[:TEM_CONTABANCARIA]-(titularConta3)
 
 CREATE (emprestimoSemGarantia3:EmprestimoSemGarantia {
-    NumeroEmprestimo: "5678901234567890-0",
-    Saldo: 16341.95, APR: .0341,
-    TotalEmprestimo: 22000.00 })<-[:TEM_EMPRESTIMOSEMGARANTIA]-(titularConta3)
+    numeroEmprestimo: "5678901234567890-0",
+    saldo: 16341.95, 
+    apr: .0341,
+    totalEmprestimo: 22000.00 })<-[:TEM_EMPRESTIMOSEMGARANTIA]-(titularConta3)
 
 CREATE (telefone2:Telefone {
-    Telefone: "555-555-1234" })<-[:TEM_TELEFONE]-(titularConta3)
-
+    ddd:11, telefone: "991557555" })<-[:TEM_TELEFONE]-(titularConta3)
+CREATE (telefone3:Telefone {
+        ddd:11, telefone: "991557500" })<-[:TEM_TELEFONE]-(titularConta4)
+    
 RETURN *
             </pre>
           </div>
@@ -387,7 +414,7 @@ MATCH 		(titularConta:TitularConta)-[]->(informacaoContato)
 WITH 		informacaoContato,
 			count(titularConta) AS Tamanho
 MATCH 		(informacaoContato)<-[]-(titularConta)
-WITH 		collect(titularConta.UniqueId) AS TitularContas,
+WITH 		collect(titularConta.uniqueId) AS TitularContas,
 			informacaoContato, Tamanho
 WHERE 		Tamanho > 1
 RETURN 		TitularContas AS Fraude,
@@ -434,6 +461,115 @@ ORDER BY 	RiscoFinanceiro DESC
 
             </pre>
           </div>
+        </div>
+      </div>
+    </slide>
+
+    <slide class="row-fluid">
+      <div class="col-sm-12 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <p>Visualização do Schema</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            CALL db.schema.visualization();
+            </pre>
+            <p>Contagens de nós, rótulos de nós, relacionamentos, tipos de relacionamento, chaves de propriedade e estatísticas</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            CALL apoc.meta.stats();
+            </pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+    
+    <slide class="row-fluid">
+      <div class="col-sm-12 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <p>Listagem de rótulos e frequências correspondentes. <i>Isso é feito iterando todos os rótulos de nós no banco de dados e calculando as frequências e as frequências relativas.</i></p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            CALL db.labels() YIELD label
+            CALL apoc.cypher.run('MATCH (:`'+label+'`) RETURN count(*) as freq',{})
+            YIELD value
+            WITH label,value.freq AS freq
+            CALL apoc.meta.stats() YIELD nodeCount
+            WITH *,3 AS presicion
+            WITH *,10^presicion AS factor,toFloat(freq)/toFloat(nodeCount) AS relFreq
+            RETURN label AS nodeLabel, freq AS frequency,round(relFreq*factor)/factor AS relativeFrequency ORDER BY freq DESC;
+            </pre>
+            <p>Listagem de relacionamentos</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            CALL db.relationshipTypes() YIELD relationshipType as type
+            CALL apoc.cypher.run('MATCH ()-[:`'+type+'`]->() RETURN count(*) as freq',{})
+            YIELD value
+            WITH type AS relationshipType, value.freq AS freq
+            CALL apoc.meta.stats() YIELD relCount
+            WITH *,3 AS presicion
+            WITH *, 10^presicion AS factor,toFloat(freq)/toFloat(relCount) as relFreq
+            RETURN relationshipType, freq AS frequency,
+                round(relFreq*factor)/factor AS relativeFrequency
+            ORDER BY freq DESC; 
+            </pre>
+
+            <p>Liste todos os nós e propriedades de relacionamento.</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            CALL apoc.meta.data() YIELD label,property,type,elementType
+            WHERE type<>'RELATIONSHIP'
+            RETURN elementType,label,property,type
+            ORDER BY elementType,label,property;
+            </pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-12 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <p>Identifique pares de clientes que compartilham dados pessoais</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            MATCH (c1:TitularConta)-[rel:TEM_EMAIL|TEM_TELEFONE|TEM_CPF]->(info)
+            <-[rel2:TEM_EMAIL|TEM_TELEFONE|TEM_CPF]-(c2:TitularConta)
+            WHERE c1.uniqueId<>c2.uniqueId
+            RETURN c1.uniqueId,c2.uniqueId,count(*) AS freq ORDER BY freq DESC;
+            </pre>
+            <p>verificando um dado compartilhado</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            MATCH (t:TitularConta)-[r:TEM_TELEFONE]->(tel:Telefone)
+where tel.telefone='991557555'
+     RETURN t.nome, tel.ddd, tel.telefone;
+            </pre>
+            <p>Numero de clientes unicos que compartilham dados pessoais</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            MATCH (c1:TitularConta)-[:TEM_EMAIL|TEM_TELEFONE|TEM_CPF]->(info)
+            <-[:TEM_EMAIL|TEM_TELEFONE|TEM_CPF]-(c2:TitularConta)
+            WHERE c1.uniqueId<>c2.uniqueId
+            RETURN count(DISTINCT c1.uniqueId) AS freq;
+            </pre>
+          </div>
+        </div>
+      </div>
+    </slide>
+
+    <slide class="row-fluid">
+      <div class="col-sm-12 ui basic segment">
+        <div class="ui card fluid">
+          <div class="ui form content">
+            <p>Crie um novo relacionamento para conectar clientes que compartilham identificadores e adicione o número de 
+identificadores compartilhados como uma propriedade nesse relacionamento</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            MATCH (c1:TitularConta)-[:TEM_EMAIL|TEM_TELEFONE|TEM_CPF]->(info)
+  <-[:TEM_EMAIL|TEM_TELEFONE|TEM_CPF]-(c2:TitularConta)
+  WHERE c1.uniqueId<>c2.uniqueId
+  WITH c1, c2, count(*) as cnt
+  MERGE (c1) - [:COMPARTILHAM_IDENTIFICADORES {count: cnt}] - (c2);
+            </pre>
+            <p>Visualize o novo relacionamento criado acima.</p>
+            <pre style="color: #333" class="pre-scrollable code runnable">
+            MATCH p = (c:TitularConta) - [s:COMPARTILHAM_IDENTIFICADORES] - () WHERE s.count >= 1 RETURN p limit 25;
+
+            </pre>
+            </div>
         </div>
       </div>
     </slide>
